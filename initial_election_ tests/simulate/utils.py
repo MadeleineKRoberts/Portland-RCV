@@ -76,8 +76,8 @@ def bradley_terry_dirichlet(
         max_ballot_length = num_poc_candidates + num_white_candidates
     num_candidates = [num_poc_candidates, num_white_candidates]
     alphas = concentrations
-    candidates = ["D" + str(x) for x in range(num_poc_candidates)] + [
-        "R" + str(x) for x in range(num_white_candidates)
+    candidates = ["C" + str(x) for x in range(1, num_poc_candidates+1)] + [
+        "W" + str(x) for x in range(1, num_white_candidates+1)
     ]
     race_of_candidate = {x: x[0] for x in candidates}
 
@@ -95,10 +95,10 @@ def bradley_terry_dirichlet(
     white_support_vector = []
     poc_support_vector = []
     for i, (c, r) in enumerate(race_of_candidate.items()):
-        if r == "D":
+        if r == "C":
             white_support_vector.append((white_support_for_poc_candidates * noise1[i]))
             poc_support_vector.append((poc_support_for_poc_candidates * noise0[i]))
-        elif r == "R":
+        elif r == "W":
             white_support_vector.append(
                 (white_support_for_white_candidates * noise1[i])
             )

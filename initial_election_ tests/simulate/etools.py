@@ -1,5 +1,6 @@
 from votekit.elections import STV, fractional_transfer
-from votekit import PlackettLuce, CambridgeSampler, AlternatingCrossover, BradleyTerry
+from votekit import PlackettLuce, CambridgeSampler, AlternatingCrossover
+from utils import BradleyTerry ## import BradleyTerry from here not votekit
 import random
 from votekit.graphs import PairwiseComparisonGraph
 import numpy as np
@@ -88,6 +89,11 @@ def simulate_ensembles(
                         alphas=alphas,
                     )
                 """
+                print(model_name)
+                print(cand_slate)
+                print(blocs)
+                print(cohesion)
+                print(alphas)
                 generator = model.from_params(
                         slate_to_candidates=cand_slate,
                         bloc_voter_prop=blocs,
