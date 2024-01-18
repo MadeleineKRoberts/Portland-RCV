@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "montana-rcv"
+version = "0.1.0"
+description = ""
+authors = ["Jack Gibson <jpgibson@uchicago.edu>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.10,<3.12"
+maup = "^1.0.8"
+gerrychain = "^0.2.22"
+votekit = "^1.0.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
