@@ -1,15 +1,17 @@
 from votekit.elections import STV, fractional_transfer
-from votekit import PlackettLuce, CambridgeSampler, AlternatingCrossover
-from utils import BradleyTerry ## import BradleyTerry from here not votekit
+from votekit import CambridgeSampler
+#from utils import BradleyTerry ## import BradleyTerry from here not votekit
 import random
 from votekit.graphs import PairwiseComparisonGraph
 import numpy as np
+import votekit.ballot_generator as bg
+from votekit.ballot_generator import SlatePreference
 
 ballot_generators = {
-    "bt": BradleyTerry,
-    "pl": PlackettLuce,
+    #"bt": BradleyTerry,
+    #"pl": PlackettLuce,
     "cs": CambridgeSampler,
-    #"ac": AlternatingCrossover,
+    "sp": SlatePreference
 }
 
 candidates = {
@@ -20,7 +22,6 @@ candidates = {
 direchlets = [
     {"W": {"C": 1, "W": 1}, "C": {"W": 1, "C": 1}},
 ]
-
 
 def simulate_ensembles(
     #ensemble: list,
@@ -39,7 +40,6 @@ def simulate_ensembles(
     """
     Runs simulation of RCV elections of an ensemble of plans
     """
-
     
     plan_results = []
 
@@ -66,40 +66,18 @@ def simulate_ensembles(
 
         # !! NOTE: Ask moon what this should be set to
         # crossover_rates = {"W": {"C": 0.4}, "C": {"W": 0.5}}
-
+        
         # loop through number of simulated RCV elections
         for _ in range(num_elections):
             for model_name, model in ballot_generators.items():
-                #print(model_name)
+                data = {
+                    'bloc_voter_prop': blocs,
+                    'cohesion': cohesion,
+                    'alphas': alphas,
+                    'slate_to_candidates':cand_slate
+                }
 
-                """
-                if model_name in ['cs', 'ac']:
-                    generator = model.from_params(
-                        slate_to_candidates=cand_slate,
-                        bloc_voter_prop=blocs,
-                        cohesion=cohesion,
-                        alphas=alphas,
-                        #bloc_crossover_rate=crossover_rates,
-                    )
-                else:
-                    generator = model.from_params(
-                        slate_to_candidates=cand_slate,
-                        bloc_voter_prop=blocs,
-                        cohesion=cohesion,
-                        alphas=alphas,
-                    )
-                """
-                #print(model_name)
-                #print(cand_slate)
-                #print(blocs)
-                #print(cohesion)
-                #print(alphas)
-                generator = model.from_params(
-                        slate_to_candidates=cand_slate,
-                        bloc_voter_prop=blocs,
-                        cohesion=cohesion,
-                        alphas=alphas,
-                    )
+                generator = model.from_params(**data)
 
                 ballots = generator.generate_profile(num_ballots)
 

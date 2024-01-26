@@ -7,6 +7,7 @@ import random
 import os
 import argparse
 
+
 # Terminal Command: 
 # python simulate_elections_zbz.py --candidates 3 3 5 3 --alpha_params 1 1 1 1 --cohesion_params 0.7 0.8 --num_elections 1
 # Will run the following:
@@ -16,10 +17,11 @@ import argparse
     # 10 elections
 
 ballot_generators = {
-    "bt": "Bradley Terry",
-    "pl": "Plackett Luce",
+    #"bt": "Bradley Terry",
+    #"pl": "Plackett Luce",
     "cs": "Cambridge Sampler",
     #"ac": AlternatingCrossover,
+    "sp": "Slate Preference"
 }
 
 def simulate_elections(candidates, alpha_params, cohesion_params, num_elections):
@@ -93,16 +95,15 @@ def simulate_elections(candidates, alpha_params, cohesion_params, num_elections)
                     #3 POC Candidates, and 0.5 for alpha CW
                     simulation_type = str(curr_zone) + "Z_" + str(num_w) + "W_" + str(num_c) + "C_" + str(alphas["C"]["C"]) + "CC_" + str(alphas["C"]["W"]) + "CW_" + str(alphas["W"]["C"]) + "WC_" + str(alphas["W"]["W"]) + "WW_" + str(cohesion["C"]) + "cohC_" +  str(cohesion["W"]) + "cohW_ " + str(num_elections) + '_Simulations'
                     
-                    generate_histogram(zone_data['bt'], 'bt', simulation_type, params, num_elections, curr_zone)
-                    generate_histogram(zone_data['pl'], 'pl', simulation_type, params, num_elections, curr_zone)
-                    generate_histogram(zone_data['cs'], 'cs', simulation_type, params, num_elections, curr_zone)
+                    generate_histogram(zone_data['cs'], 'cs', simulation_type, params, num_elections, curr_zone, num_w, num_c)
+                    generate_histogram(zone_data['sp'], 'sp', simulation_type, params, num_elections, curr_zone, num_w, num_c)
 
 
 import os
 import matplotlib.pyplot as plt
 import numpy as np
 
-def generate_histogram(data, election_type, simulation_type, params, num_elections, curr_zone, show_plot=False):
+def generate_histogram(data, election_type, simulation_type, params, num_elections, curr_zone, num_w, num_c, show_plot=False):
     unique_values, counts = np.unique(data, return_counts=True)
 
     # Ensure that the bins on the x-axis include 0, 1, 2, and 3
@@ -125,7 +126,7 @@ def generate_histogram(data, election_type, simulation_type, params, num_electio
     plt.text(0.05, 0.95, params, transform=plt.gca().transAxes, fontsize=8, verticalalignment='top')
     plt.tight_layout()
 
-    folder_name = election_type + '_Histograms'
+    folder_name = str(election_type) + '_Zone_' + str(curr_zone) + '_' + str(num_w) + 'W_' + str(num_c) + 'C_Histograms'
     output_directory = os.path.join(os.getcwd(), 'Histograms', folder_name)
     if not os.path.exists(output_directory):
         os.makedirs(output_directory)
@@ -135,7 +136,6 @@ def generate_histogram(data, election_type, simulation_type, params, num_electio
     if show_plot:
         plt.show()
     plt.clf()
-
 
 if __name__ == "__main__":
     # Parameters to change
