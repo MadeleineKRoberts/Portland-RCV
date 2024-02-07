@@ -6,169 +6,236 @@ import json
 import random
 import os
 import argparse
+import re
 
-
-# Terminal Command: 
-# python simulate_elections_zbz.py --candidates 3 3 5 3 --alpha_params 1 1 1 1 --cohesion_params 0.7 0.8 --num_elections 1
-# Will run the following:
-    # 3W 3C candidates and 5W, 3C candidates
-    # alphas = {"W": {"C": 1, "W": 1}, "C": {"W": 1, "C": 1}}
-    # cohesion={"W": 0.7, "C": 0.8}
-    # 10 elections
 
 ballot_generators = {
-    #"bt": "Bradley Terry",
-    #"pl": "Plackett Luce",
-    "cs": "Cambridge Sampler",
-    #"ac": AlternatingCrossover,
     "sp": "Slate Preference"
 }
 
-def simulate_elections(candidates, alpha_params, cohesion_params, num_elections):
-    for cand in candidates:
-       for a in alpha_params:
-            for coh in cohesion_params:
+def simulate_elections(candidates, alpha_poc_params, alpha_wp_params, alpha_wc_params, 
+                        cohesion_poc_params, cohesion_white_progressive_params, 
+                        cohesion_white_conservative_params, num_elections):
 
-                num_w = cand[0]
-                num_c = cand[1]
+    candidates_poc = candidates[0]
+    candidates_wp = candidates[1]
+    candidates_wc = candidates[2]
 
-                wc = a[0]
-                ww = a[1]
-                cw = a[2]
-                cc = a[3]
+    alpha_poc_1 = alpha_poc_params[0]
+    alpha_poc_2 = alpha_poc_params[1]
+    alpha_poc_3 = alpha_poc_params[2]
 
-                coh_w = coh[0]
-                coh_c = coh[1]
-                
-                alphas = {"W": {"C": wc, "W": ww}, "C": {"W": cw, "C": cc}}
-                cohesion={"W": coh_w, "C": coh_c}
+    alpha_wp_1 = alpha_wp_params[0]
+    alpha_wp_2 = alpha_wp_params[1]
+    alpha_wp_3 = alpha_wp_params[2]
 
-                basic_start = simulate_ensembles(
-                    cohesion=cohesion,
-                    num_w=num_w,
-                    num_c=num_c,
-                    seats=3,
-                    num_elections=num_elections,
-                    alphas=alphas
-                )
-                
-                # iterate across each zones
-                for zone_data in basic_start:
-                    curr_zone = zone_data['zone'] + 1
+    alpha_wc_1 = alpha_wc_params[0]
+    alpha_wc_2 = alpha_wc_params[1]
+    alpha_wc_3 = alpha_wc_params[2]
 
-                    params = (
-                    "Zone: " + str(curr_zone) + ";\n"
-                    "White candidates: " + str(num_w) + ";\n"
-                    "POC candidates: " + str(num_c) + ";\n"
-                    "alpha_WC " +  str(wc) + ";\n" 
-                    "alpha_WW: " + str(ww)  + ";\n" 
-                    "alpha_CW " +  str(cw) + ";\n" 
-                    "alpha_CC: " + str(cc)
-                    + ";\n" "Number of Simulated Elections per Zone: " + str(num_elections)
-                    )
+    coh_poc_1 = cohesion_poc_params[0]
+    coh_poc_2 = cohesion_poc_params[1]
+    coh_poc_3 = cohesion_poc_params[2]
 
-                    converted_results = {key: value for key, value in zone_data.items() if key not in ['zone', 'voter_share']}
+    coh_wp_1 = cohesion_white_progressive_params[0]
+    coh_wp_2 = cohesion_white_progressive_params[1]
+    coh_wp_3 = cohesion_white_progressive_params[2]
 
-                    election_results = {
-                        "params": {
-                            "zone" : curr_zone,
-                            "num_white_candidates": num_w,
-                            "num_poc_candidates": num_c,
-                            "alphas": alphas,
-                            "cohesion": cohesion
-                        },
-                        "results": converted_results
-                    }
+    coh_wc_1 = cohesion_white_conservative_params[0]
+    coh_wc_2 = cohesion_white_conservative_params[1]
+    coh_wc_3 = cohesion_white_conservative_params[2]
 
-                    # Define the filename for JSON output
-                    json_filename = f'zone_{curr_zone}_{num_elections}_elections_results.json'
-                    output_directory = os.path.join(os.getcwd(), 'Results')
-                    if not os.path.exists(output_directory):
-                        os.makedirs(output_directory)
-                    json_output_path = os.path.join(output_directory, json_filename)
+    alphas = {"C": {"C": alpha_poc_1, "WP": alpha_poc_2, "WC": alpha_poc_3},
+            "WP": {"C": alpha_wp_1, "WP": alpha_wp_2, "WC": alpha_wp_3},
+            "WC": {"C": alpha_wc_1, "WP": alpha_wc_2, "WC": alpha_wc_3}}
+    cohesion = {"C": {"C": coh_poc_1, "WP": coh_poc_2, "WC": coh_poc_3},
+            "WP": {"C": coh_wp_1, "WP": coh_wp_2, "WC": coh_wp_3},
+            "WC": {"C": coh_wc_1, "WP": coh_wc_2, "WC": coh_wc_3}}
 
-                    with open(json_output_path, 'w') as json_file:
-                        json.dump(election_results, json_file, indent=4)
+    basic_start = simulate_ensembles(
+        cohesion=cohesion, 
+        seats=3,
+        num_elections=num_elections,
+        alphas=alphas,
+        candidates=candidates
+    )
 
-                    # simulation type is for the file name - 
-                    #example: 1_3W_3C_0.5CC means alpha = 1 for alpha WW,WC,CW; 3 White candidates, 
-                    #3 POC Candidates, and 0.5 for alpha CW
-                    simulation_type = str(curr_zone) + "Z_" + str(num_w) + "W_" + str(num_c) + "C_" + str(alphas["C"]["C"]) + "CC_" + str(alphas["C"]["W"]) + "CW_" + str(alphas["W"]["C"]) + "WC_" + str(alphas["W"]["W"]) + "WW_" + str(cohesion["C"]) + "cohC_" +  str(cohesion["W"]) + "cohW_ " + str(num_elections) + '_Simulations'
-                    
-                    generate_histogram(zone_data['cs'], 'cs', simulation_type, params, num_elections, curr_zone, num_w, num_c)
-                    generate_histogram(zone_data['sp'], 'sp', simulation_type, params, num_elections, curr_zone, num_w, num_c)
+    basic_start_zone_data, aggregated_data = basic_start
+    # iterate across each zones
+    for zone_data in basic_start_zone_data:
+        curr_zone = zone_data['zone'] + 1
+
+        # Update the params string to accurately reflect simulation setup
+        params = (
+            f"MODEL PARAMETERS\n"
+            f"\n"
+            f"Zone: {curr_zone}\n"
+            f"Number of POC candidates: {candidates_poc}\n"
+            f"Number of WP candidates: {candidates_wp}\n"
+            f"Number of WC candidates: {candidates_wc}\n"
+            "Alphas POC (POC, WP, WC): " + ", ".join(map(str, alpha_poc_params)) + "\n"
+            "Alphas WP (POC, WP, WC): " + ", ".join(map(str, alpha_wp_params)) + "\n"
+            "Alphas WC (POC, WP, WC): " + ", ".join(map(str, alpha_wc_params)) + "\n"
+            "Cohesion POC (POC, WP, WC): " + ", ".join(map(str, cohesion_poc_params)) + "\n"
+            "Cohesion WP (POC, WP, WC): " + ", ".join(map(str, cohesion_white_progressive_params)) + "\n"
+            "Cohesion WC (POC, WP, WC): " + ", ".join(map(str, cohesion_white_conservative_params)) + "\n"
+            f"Number of Simulated Elections: {num_elections}"
+        )
+        converted_results = {key: value for key, value in zone_data.items() if key not in ['zone', 'voter_share']}
+       
+        election_results = {
+            "params": {
+                "zone": curr_zone,
+                "num_elections": num_elections,
+                "alphas": alphas,
+                "cohesion": cohesion,
+                "candidates": {
+                    "POC": candidates_poc,
+                    "WP": candidates_wp,
+                    "WC": candidates_wc,
+                },
+            "results": converted_results
+            }
+        }
+
+        # Define filename for JSON output based on zone and number of elections
+        json_filename = f'zone_{curr_zone}_{num_elections}_elections_results.json'
+        output_directory = os.path.join(os.getcwd(), 'Results')
+        if not os.path.exists(output_directory):
+            os.makedirs(output_directory)
+        json_output_path = os.path.join(output_directory, json_filename)
+
+        with open(json_output_path, 'w') as json_file:
+            json.dump(election_results, json_file, indent=4)
+
+        # Construct a string to describe the simulation type, should be done outside the 'with open' block
+        simulation_type = (
+            f'{candidates_poc}C_{candidates_wp}WP_{candidates_wc}WC_'
+            f'{alphas["C"]["C"]}aCC_{alphas["C"]["WP"]}aCWP_{alphas["C"]["WC"]}aCWC_'
+            f'{coh_poc_1}cohC_{coh_wp_1}cohWP_{coh_wc_1}cohWC_'
+            f'{num_elections}sims'
+        )
+
+        generate_histogram(
+            data=zone_data['sp'],  
+            election_type='sp', 
+            simulation_type=simulation_type, 
+            params=params,  
+            num_elections=num_elections,  
+            curr_zone=curr_zone, 
+            num_candidates_c=candidates_poc,  
+            num_candidates_wp=candidates_wp, 
+            num_candidates_wc=candidates_wc,
+            zone=True
+        )
+
+        generate_histogram(
+            data=aggregated_data['sp'],  
+            election_type='sp', 
+            simulation_type=simulation_type, 
+            params=params,  
+            num_elections=num_elections,  
+            curr_zone=curr_zone, 
+            num_candidates_c=candidates_poc,  
+            num_candidates_wp=candidates_wp, 
+            num_candidates_wc=candidates_wc,
+            zone=False
+        )
+        
 
 
-import os
-import matplotlib.pyplot as plt
-import numpy as np
-
-def generate_histogram(data, election_type, simulation_type, params, num_elections, curr_zone, num_w, num_c, show_plot=False):
+def generate_histogram(data, election_type, simulation_type, params, num_elections, curr_zone, num_candidates_c, 
+                       num_candidates_wp, num_candidates_wc, show_plot=False, zone=True):
+    """
+    Generate and save a histogram based on election data.
+    """
     unique_values, counts = np.unique(data, return_counts=True)
+
+    fig, ax = plt.subplots(figsize=(6,8), nrows=2, ncols=1)
 
     # Ensure that the bins on the x-axis include 0, 1, 2, and 3
     bin_edges = np.arange(-0.5, max(unique_values) + 1.5, 1)
-    plt.hist(data, bins=bin_edges, align='mid', alpha=0.7, edgecolor='black')
-
-    # Set ranges for axes
-    plt.xticks([0, 1, 2, 3])
-
-    plt.ylim(0, num_elections)  # Set to the number of simulated elections
-
-    plt.xlabel('Number of Elected POC Candidates')
-    plt.ylabel('Frequency')
-    plt.title('Histogram for ' + ballot_generators[election_type] + ' model ')
-
-    # Display the average
+    ax[0].hist(data, bins=bin_edges, align='mid', alpha=0.7, edgecolor='black')
+    if zone:
+        ax[0].set_xticks([0, 1, 2, 3])
+    else:
+        ax[0].set_xticks([0, 1, 2, 3, 4, 5, 6, 7, 8])
+        
+    ax[0].set_ylim(0, num_elections)  # Set to the number of simulated elections
+    ax[0].set_xlabel('Number of Elected POC Candidates')
+    ax[0].set_ylabel('Frequency')
+    ax[0].set_title(f'Histogram for {election_type.upper()} Model')
+     # Display the average and parameters text
     average_value = np.mean(data)
-    plt.text(0.5, -0.15, f'Average Number of Elected POC Candidates: {average_value:.2f}', transform=plt.gca().transAxes, fontsize=10, ha='center')
+    
+    # Create an external legend box for params
+    if zone:
+        params = params
+        ax[1].text(0.25, 0.5, params, ha='left', va='center', fontsize=8, wrap=True,
+         bbox=dict(facecolor='white', edgecolor='black', boxstyle='round,pad=0.5', alpha=1))
+        # Adjust layout to accommodate the new legend box
+        ax[1].set_axis_off()
+        fig.subplots_adjust(bottom=0.25, top=0.95)
+    else:
+        pattern = 'Zone: 4'
+        replacement = 'Zone: All'
+        params = re.sub(pattern, replacement, params)
+        ax[1].text(0.25, 0.5, params, ha='left', va='center', fontsize=8, wrap=True,
+        bbox=dict(facecolor='white', edgecolor='black', boxstyle='round,pad=0.5', alpha=1))
+        # Adjust layout to accommodate the new legend box
+        ax[1].set_axis_off()
+        fig.subplots_adjust(bottom=0.25, top=0.95)
 
-    plt.text(0.05, 0.95, params, transform=plt.gca().transAxes, fontsize=8, verticalalignment='top')
-    plt.tight_layout()
+    ax[1].text(0.5, 0.95, f'Average Number of Elected POC Candidates: {average_value:.2f}', ha="center", fontsize=8)
 
-    folder_name = str(election_type) + '_Zone_' + str(curr_zone) + '_' + str(num_w) + 'W_' + str(num_c) + 'C_Histograms'
+    if zone:
+        folder_name = f'{election_type}_Zone_{curr_zone}_Histograms'
+    else:
+        folder_name = f'{election_type}_Aggregate_Histograms'
     output_directory = os.path.join(os.getcwd(), 'Histograms', folder_name)
     if not os.path.exists(output_directory):
         os.makedirs(output_directory)
 
-    output_path = os.path.join(output_directory, f'zone_{curr_zone}_{election_type}_{simulation_type}_histogram.png')
-    plt.savefig(output_path)
+    output_path = os.path.join(output_directory, f'{simulation_type}_histogram.png')
+    plt.savefig(output_path, bbox_inches="tight")
     if show_plot:
         plt.show()
-    plt.clf()
+    plt.close()
+
+def parse_args():
+    parser = argparse.ArgumentParser(description='Run election simulations.')
+    parser.add_argument("--candidates", type=str, help="Number of candidates in order POC, WP, WC")
+    parser.add_argument("--alpha_poc_params", type=str, help="Alpha parameters for POC candidates")
+    parser.add_argument("--alpha_wp_params", type=str, help="Alpha parameters for white progressive candidates")
+    parser.add_argument("--alpha_wc_params", type=str, help="Alpha parameters for white conservative candidates")
+    parser.add_argument("--cohesion_poc_params", type=str, help="Cohesion parameters for POC")
+    parser.add_argument("--cohesion_white_progressive_params", type=str, help="Cohesion parameters for white progressives")
+    parser.add_argument("--cohesion_white_conservative_params", type=str, help="Cohesion parameters for white conservatives")
+    parser.add_argument("--num_elections", type=int, help="Number of elections to simulate")
+
+    return parser.parse_args()
+
+def main():
+    args = parse_args()
+    
+    candidates = [int(i) for i in args.candidates.split(' ')]
+    alpha_poc_params = [float(i) for i in args.alpha_poc_params.split(' ')]
+    alpha_wp_params = [float(i) for i in args.alpha_wp_params.split(' ')]
+    alpha_wc_params = [float(i) for i in args.alpha_wc_params.split(' ')]
+    cohesion_poc_params = [float(i) for i in args.cohesion_poc_params.split(' ')]
+    cohesion_white_progressive_params = [float(i) for i in args.cohesion_white_progressive_params.split(' ')]
+    cohesion_white_conservative_params= [float(i) for i in args.cohesion_white_conservative_params.split(' ')]
+
+    simulate_elections(
+        candidates = candidates,
+        alpha_poc_params=alpha_poc_params,
+        alpha_wp_params=alpha_wp_params,
+        alpha_wc_params=alpha_wc_params,
+        cohesion_poc_params=cohesion_poc_params,
+        cohesion_white_progressive_params=cohesion_white_progressive_params,
+        cohesion_white_conservative_params=cohesion_white_conservative_params,
+        num_elections=args.num_elections
+    )
 
 if __name__ == "__main__":
-    # Parameters to change
-    # alpha_cc = [0.5, 1, 2]
-    # alpha = [1, 0.5, 2]
-    # candidates = [(3,3),(3,5),(5,3),(2,6),(6,2)]
-    parser = argparse.ArgumentParser(description='Run election simulations.')
-    parser.add_argument("--candidates", type=int, nargs='+')
-    parser.add_argument("--alpha_params", type=float, nargs='+')
-    parser.add_argument("--cohesion_params", type=float, nargs='+')
-    parser.add_argument("--num_elections", type=int)
-    
-    args = parser.parse_args()
-
-    candidates_long_list = args.candidates
-    candidates_len = len(candidates_long_list)
-    candidates = []
-    for i in range(0,candidates_len,2):
-        candidates.append((candidates_long_list[i], candidates_long_list[i+1]))
-
-    alpha_params_long_list = args.alpha_params
-    alpha_params_len = len(alpha_params_long_list)
-    alpha_params = []
-    for i in range(0,alpha_params_len,4):
-        alpha_params.append([alpha_params_long_list[i], alpha_params_long_list[i+1], alpha_params_long_list[i+2], alpha_params_long_list[i+3]])
-
-    cohesion_params_long_list = args.cohesion_params
-    cohesion_params_len = len(cohesion_params_long_list)
-    cohesion_params = []
-    for i in range(0,cohesion_params_len,2):
-        cohesion_params.append((cohesion_params_long_list[i], cohesion_params_long_list[i+1]))
-
-    num_elections = args.num_elections
-
-    simulate_elections(candidates=candidates, alpha_params=alpha_params, cohesion_params=cohesion_params, num_elections=num_elections)
-
+    main()
