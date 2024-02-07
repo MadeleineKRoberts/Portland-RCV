@@ -1,6 +1,5 @@
 from votekit.elections import STV, fractional_transfer
 from votekit import CambridgeSampler
-#from utils import BradleyTerry ## import BradleyTerry from here not votekit
 import random
 from votekit.graphs import PairwiseComparisonGraph
 import numpy as np
