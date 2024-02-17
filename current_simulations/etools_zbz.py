@@ -70,18 +70,11 @@ def simulate_ensembles(
                 }
 
                 generator = model.from_params(**data)
-                print("Preference Intervals:", generator.pref_intervals_by_bloc)
+                #print("Preference Intervals:", generator.pref_intervals_by_bloc)
 
                 ballots = generator.generate_profile(num_ballots)
-                pp_dict, agg_prof = cs.generate_profile(num_ballots = 1000, by_bloc = True)
-                
-                c_ballots = pp_dict["C"]
-                wp_ballots = pp_dict["WP"]
-                wc_ballots = pp_dict["WC"]
 
-                print('c ballots', c_ballots, 'wp_ballots', wp_ballots, 'wc_ballots', wc_ballots )
-
-                ballots.to_csv(current_dir + '/ballots.csv')
+                #ballots.to_csv(current_dir + '/ballots.csv')
 
                 results = STV(
                     ballots,
@@ -99,8 +92,8 @@ def simulate_ensembles(
                 zone_data[model_name].append(num_winners)
         plan_results.append(zone_data)
 
-    print(f"Plan Results {idx + 1}", plan_results)
-    print("Results across zones", condense_results(plan_results))
+    #print(f"Plan Results {idx + 1}", plan_results)
+    #print("Results across zones", condense_results(plan_results))
     #print(plan_results)
 
     return(plan_results), condense_results(plan_results)
