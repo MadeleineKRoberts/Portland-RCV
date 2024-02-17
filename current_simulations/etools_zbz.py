@@ -1,10 +1,13 @@
 from votekit.elections import STV, fractional_transfer
 from votekit import CambridgeSampler
+#from utils import BradleyTerry ## import BradleyTerry from here not votekit
 import random
 from votekit.graphs import PairwiseComparisonGraph
 import numpy as np
 import votekit.ballot_generator as bg
 from votekit.ballot_generator import SlatePreference
+import json
+import os
 
 ballot_generators = {
     #"bt": BradleyTerry,
@@ -18,10 +21,6 @@ candidates_to_select = {
     "WC": ["WC1", "WC2", "WC3", "WC4", "WC5", "WC6", "WC7", "WC8", "WC9", "WC10"],
     "C": ["C1", "C2", "C3", "C4", "C5", "C6", "C7", "C8", "C9", "C10"],
 }
-
-direchlets = [
-    {"W": {"C": 1, "W": 1}, "C": {"W": 1, "C": 1}},
-]
 
 def simulate_ensembles(
     #ensemble: list,
@@ -41,16 +40,19 @@ def simulate_ensembles(
     """
     
     plan_results = []
+    current_file_path = os.path.abspath(__file__)
+    current_dir = os.path.dirname(current_file_path)
 
     # Portland blocks and coorsponding white VAP
     zone_shares = {1:0.568, 2:0.683, 3:0.744, 4:0.764}
 
-    # Interate across the 4 Porland blocks
+    # Interate across the 4 Portland blocks
     for idx, share in enumerate(zone_shares):
         zone_data = {}
         zone_data["zone"] = idx
         zone_data["voter_share"] = share
         # build hyperparams base on share and other toggles
+        # based on the voter file
         blocs = {"C": 0.15, "WP": 0.79, "WC": 0.06}
         cand_slate = {
             "WP": candidates_to_select["WP"][:candidates[1]],  
@@ -68,8 +70,18 @@ def simulate_ensembles(
                 }
 
                 generator = model.from_params(**data)
+                print("Preference Intervals:", generator.pref_intervals_by_bloc)
 
                 ballots = generator.generate_profile(num_ballots)
+                pp_dict, agg_prof = cs.generate_profile(num_ballots = 1000, by_bloc = True)
+                
+                c_ballots = pp_dict["C"]
+                wp_ballots = pp_dict["WP"]
+                wc_ballots = pp_dict["WC"]
+
+                print('c ballots', c_ballots, 'wp_ballots', wp_ballots, 'wc_ballots', wc_ballots )
+
+                ballots.to_csv(current_dir + '/ballots.csv')
 
                 results = STV(
                     ballots,
@@ -85,9 +97,11 @@ def simulate_ensembles(
                 if model_name not in zone_data:
                     zone_data[model_name] = []
                 zone_data[model_name].append(num_winners)
-
         plan_results.append(zone_data)
-    print(plan_results)
+
+    print(f"Plan Results {idx + 1}", plan_results)
+    print("Results across zones", condense_results(plan_results))
+    #print(plan_results)
 
     return(plan_results), condense_results(plan_results)
 
@@ -121,6 +135,17 @@ def count_winners(elected: list[set], party: str) -> int:
                 winner_count += 1
 
     return winner_count
+
+def convert_tuples_in_keys(obj):
+    """Recursively convert tuples in dictionary keys to strings."""
+    if isinstance(obj, dict):
+        return {str(key): convert_tuples_in_keys(value) for key, value in obj.items()}
+    elif isinstance(obj, list):
+        return [convert_tuples_in_keys(element) for element in obj]
+    elif isinstance(obj, tuple):
+        return str(obj) 
+    else:
+        return obj 
 
 
 def slate_by_share(vote_share: float) -> dict:
