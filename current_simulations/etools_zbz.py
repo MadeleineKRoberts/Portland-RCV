@@ -44,16 +44,32 @@ def simulate_ensembles(
     current_dir = os.path.dirname(current_file_path)
 
     # Portland blocks and coorsponding white VAP
-    zone_shares = {1:0.568, 2:0.683, 3:0.744, 4:0.764}
+    # Option 1 WC + Non-Progressive Whites Grouped as WC
+    # Option 2 Leave Out Non-Progressive Whites
+    bloc_option = True
+
+    if bloc_option:
+        zone_shares = {1: {"C": 0.31, "WP": 0.18, "WC": 0.51},
+            2: {"C": 0.2, "WP": 0.46, "WC": 0.34},
+            3: {"C": 0.16, "WP": 0.49, "WC": 0.35},
+            4: {"C": 0.14, "WP": 0.46, "WC": 0.40}}
+    else:
+        zone_shares = {1: {"C": 0.55, "WP": 0.33, "WC": 0.12}, 
+            2: {"C": 0.28, "WP": 0.69, "WC": 0.03},
+            3: {"C": 0.24, "WP": 0.73, "WC": 0.04},
+            4: {"C": 0.22, "WP": 0.72, "WC": 0.06}}
+
 
     # Interate across the 4 Portland blocks
-    for idx, share in enumerate(zone_shares):
+    for zn in zone_shares.keys():
+        assert set(zone_shares.keys()) == {1, 2, 3, 4}, "Unexpected zones in zone_shares"
+        print('zone', zn)
         zone_data = {}
-        zone_data["zone"] = idx
-        zone_data["voter_share"] = share
+        zone_data["zone"] = zn
         # build hyperparams base on share and other toggles
         # based on the voter file
-        blocs = {"C": 0.15, "WP": 0.79, "WC": 0.06}
+        blocs = zone_shares[zn]
+        print (zn, blocs)
         cand_slate = {
             "WP": candidates_to_select["WP"][:candidates[1]],  
             "WC": candidates_to_select["WC"][:candidates[2]],  
@@ -92,8 +108,8 @@ def simulate_ensembles(
                 zone_data[model_name].append(num_winners)
         plan_results.append(zone_data)
 
-    #print(f"Plan Results {idx + 1}", plan_results)
-    #print("Results across zones", condense_results(plan_results))
+    print(f"Plan Results {zn}", plan_results)
+    print("Results across zones", condense_results(plan_results))
     #print(plan_results)
 
     return(plan_results), condense_results(plan_results)

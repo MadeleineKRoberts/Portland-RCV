@@ -62,8 +62,13 @@ def simulate_elections(candidates, alpha_poc_params, alpha_wp_params, alpha_wc_p
 
     basic_start_zone_data, aggregated_data = basic_start
     # iterate across each zones
+    print('basic_start_zone_data',basic_start_zone_data)
     for zone_data in basic_start_zone_data:
-        curr_zone = zone_data['zone'] + 1
+        print('hist zone', zone_data)
+        curr_zone = zone_data['zone']
+        print('hist curr zone', curr_zone)
+        results = zone_data['sp']
+        print('hist results', results)
 
         # Update the params string to accurately reflect simulation setup
         params = (
@@ -81,7 +86,6 @@ def simulate_elections(candidates, alpha_poc_params, alpha_wp_params, alpha_wc_p
             "Cohesion WC (POC, WP, WC): " + ", ".join(map(str, cohesion_white_conservative_params)) + "\n"
             f"Number of Simulated Elections: {num_elections}"
         )
-        converted_results = {key: value for key, value in zone_data.items() if key not in ['zone', 'voter_share']}
        
         election_results = {
             "params": {
@@ -94,7 +98,7 @@ def simulate_elections(candidates, alpha_poc_params, alpha_wp_params, alpha_wc_p
                     "WP": candidates_wp,
                     "WC": candidates_wc,
                 },
-            "results": converted_results
+            "results": results
             }
         }
 
