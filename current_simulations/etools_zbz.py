@@ -46,19 +46,16 @@ def simulate_ensembles(
     # Portland blocks and coorsponding white VAP
     # Option 1 WC + Non-Progressive Whites Grouped as WC
     # Option 2 Leave Out Non-Progressive Whites
-    bloc_option = True
 
-    if bloc_option:
-        zone_shares = {1: {"C": 0.31, "WP": 0.18, "WC": 0.51},
-            2: {"C": 0.2, "WP": 0.46, "WC": 0.34},
-            3: {"C": 0.16, "WP": 0.49, "WC": 0.35},
-            4: {"C": 0.14, "WP": 0.46, "WC": 0.40}}
-    else:
-        zone_shares = {1: {"C": 0.55, "WP": 0.33, "WC": 0.12}, 
-            2: {"C": 0.28, "WP": 0.69, "WC": 0.03},
-            3: {"C": 0.24, "WP": 0.73, "WC": 0.04},
-            4: {"C": 0.22, "WP": 0.72, "WC": 0.06}}
+    zone_shares = {1: {"C": 0.38, "WP": 0.43, "WC": 0.19},
+            2: {"C": 0.26, "WP": 0.68, "WC": 0.06},
+            3: {"C": 0.20, "WP": 0.73, "WC": 0.07},
+            4: {"C": 0.17, "WP": 0.73, "WC": 0.10}}
 
+    for zone, shares in zone_shares.items():
+        total_share = sum(shares.values())
+        if total_share != 1:
+            print(f"Zone {zone} sum is {total_share}, which does not equal 1.")
 
     # Interate across the 4 Portland blocks
     for zn in zone_shares.keys():
