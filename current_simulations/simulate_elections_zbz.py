@@ -62,6 +62,8 @@ def simulate_elections(candidates, alpha_poc_params, alpha_wp_params, alpha_wc_p
 
     basic_start_zone_data, aggregated_data = basic_start
     # iterate across each zones
+    cand_types = ['C', 'WP', 'WC']
+    cand_long = {'C':'POC Preferred', 'WP':'White Progressive Preferred', 'WC':'White Moderate Preferred'}
     print('basic_start_zone_data',basic_start_zone_data)
     for zone_data in basic_start_zone_data:
         print('hist zone', zone_data)
@@ -70,85 +72,89 @@ def simulate_elections(candidates, alpha_poc_params, alpha_wp_params, alpha_wc_p
         results = zone_data['sp']
         print('hist results', results)
 
-        # Update the params string to accurately reflect simulation setup
-        params = (
-            f"MODEL PARAMETERS\n"
-            f"\n"
-            f"Zone: {curr_zone}\n"
-            f"Number of POC candidates: {candidates_poc}\n"
-            f"Number of WP candidates: {candidates_wp}\n"
-            f"Number of WC candidates: {candidates_wc}\n"
-            "Alphas POC (POC, WP, WC): " + ", ".join(map(str, alpha_poc_params)) + "\n"
-            "Alphas WP (POC, WP, WC): " + ", ".join(map(str, alpha_wp_params)) + "\n"
-            "Alphas WC (POC, WP, WC): " + ", ".join(map(str, alpha_wc_params)) + "\n"
-            "Cohesion POC (POC, WP, WC): " + ", ".join(map(str, cohesion_poc_params)) + "\n"
-            "Cohesion WP (POC, WP, WC): " + ", ".join(map(str, cohesion_white_progressive_params)) + "\n"
-            "Cohesion WC (POC, WP, WC): " + ", ".join(map(str, cohesion_white_conservative_params)) + "\n"
-            f"Number of Simulated Elections: {num_elections}"
-        )
-       
-        election_results = {
-            "params": {
-                "zone": curr_zone,
-                "num_elections": num_elections,
-                "alphas": alphas,
-                "cohesion": cohesion,
-                "candidates": {
-                    "POC": candidates_poc,
-                    "WP": candidates_wp,
-                    "WC": candidates_wc,
-                },
-            "results": results
+        for curr_cand in cand_types:
+            # Update the params string to accurately reflect simulation setup
+            params = (
+                f"MODEL PARAMETERS\n"
+                f"\n"
+                f"Zone: {curr_zone}\n"
+                f"Number of POC candidates: {candidates_poc}\n"
+                f"Number of WP candidates: {candidates_wp}\n"
+                f"Number of WC candidates: {candidates_wc}\n"
+                "Alphas POC (POC, WP, WC): " + ", ".join(map(str, alpha_poc_params)) + "\n"
+                "Alphas WP (POC, WP, WC): " + ", ".join(map(str, alpha_wp_params)) + "\n"
+                "Alphas WC (POC, WP, WC): " + ", ".join(map(str, alpha_wc_params)) + "\n"
+                "Cohesion POC (POC, WP, WC): " + ", ".join(map(str, cohesion_poc_params)) + "\n"
+                "Cohesion WP (POC, WP, WC): " + ", ".join(map(str, cohesion_white_progressive_params)) + "\n"
+                "Cohesion WC (POC, WP, WC): " + ", ".join(map(str, cohesion_white_conservative_params)) + "\n"
+                f"Number of Simulated Elections: {num_elections}"
+            )
+        
+            election_results = {
+                "params": {
+                    "zone": curr_zone,
+                    "candidate_type": curr_cand,
+                    "num_elections": num_elections,
+                    "alphas": alphas,
+                    "cohesion": cohesion,
+                    "candidates": {
+                        "POC": candidates_poc,
+                        "WP": candidates_wp,
+                        "WC": candidates_wc,
+                    },
+                "results": results
+                }
             }
-        }
 
-        # Define filename for JSON output based on zone and number of elections
-        json_filename = f'zone_{curr_zone}_{num_elections}_elections_results.json'
-        output_directory = os.path.join(os.getcwd(), 'Results')
-        if not os.path.exists(output_directory):
-            os.makedirs(output_directory)
-        json_output_path = os.path.join(output_directory, json_filename)
+            # Define filename for JSON output based on zone and number of elections
+            json_filename = f'zone_{curr_zone}_{curr_cand}_{num_elections}_elections_results.json'
+            output_directory = os.path.join(os.getcwd(), 'Results')
+            if not os.path.exists(output_directory):
+                os.makedirs(output_directory)
+            json_output_path = os.path.join(output_directory, json_filename)
 
-        with open(json_output_path, 'w') as json_file:
-            json.dump(election_results, json_file, indent=4)
+            with open(json_output_path, 'w') as json_file:
+                json.dump(election_results, json_file, indent=4)
 
-        # Construct a string to describe the simulation type, should be done outside the 'with open' block
-        simulation_type = (
-            f'{candidates_poc}C_{candidates_wp}WP_{candidates_wc}WC_'
-            f'{alphas["C"]["C"]}aCC_{alphas["C"]["WP"]}aCWP_{alphas["C"]["WC"]}aCWC_'
-            f'{coh_poc_1}cohC_{coh_wp_1}cohWP_{coh_wc_1}cohWC_'
-            f'{num_elections}sims'
-        )
+            # Construct a string to describe the simulation type, should be done outside the 'with open' block
+            simulation_type = (
+                f'{curr_cand}candType_{candidates_poc}C_{candidates_wp}WP_{candidates_wc}WC_'
+                f'{alphas["C"]["C"]}aCC_{alphas["C"]["WP"]}aCWP_{alphas["C"]["WC"]}aCWC_'
+                f'{coh_poc_1}cohC_{coh_wp_1}cohWP_{coh_wc_1}cohWC_'
+                f'{num_elections}sims'
+            )
 
-        generate_histogram(
-            data=zone_data['sp'],  
-            election_type='sp', 
-            simulation_type=simulation_type, 
-            params=params,  
-            num_elections=num_elections,  
-            curr_zone=curr_zone, 
-            num_candidates_c=candidates_poc,  
-            num_candidates_wp=candidates_wp, 
-            num_candidates_wc=candidates_wc,
-            zone=True
-        )
+            generate_histogram(
+                data=zone_data['sp'][curr_cand],  
+                cand_type=cand_long[curr_cand],
+                election_type='sp', 
+                simulation_type=simulation_type, 
+                params=params,  
+                num_elections=num_elections,  
+                curr_zone=curr_zone, 
+                num_candidates_c=candidates_poc,  
+                num_candidates_wp=candidates_wp, 
+                num_candidates_wc=candidates_wc,
+                zone=True
+            )
 
-        generate_histogram(
-            data=aggregated_data['sp'],  
-            election_type='sp', 
-            simulation_type=simulation_type, 
-            params=params,  
-            num_elections=num_elections,  
-            curr_zone=curr_zone, 
-            num_candidates_c=candidates_poc,  
-            num_candidates_wp=candidates_wp, 
-            num_candidates_wc=candidates_wc,
-            zone=False
-        )
+            generate_histogram(
+                data=aggregated_data['sp'][curr_cand],  
+                cand_type=cand_long[curr_cand],
+                election_type='sp', 
+                simulation_type=simulation_type, 
+                params=params,  
+                num_elections=num_elections,  
+                curr_zone=curr_zone, 
+                num_candidates_c=candidates_poc,  
+                num_candidates_wp=candidates_wp, 
+                num_candidates_wc=candidates_wc,
+                zone=False
+            )
         
 
 
-def generate_histogram(data, election_type, simulation_type, params, num_elections, curr_zone, num_candidates_c, 
+def generate_histogram(data, cand_type, election_type, simulation_type, params, num_elections, curr_zone, num_candidates_c, 
                        num_candidates_wp, num_candidates_wc, show_plot=False, zone=True):
     """
     Generate and save a histogram based on election data.
@@ -166,7 +172,7 @@ def generate_histogram(data, election_type, simulation_type, params, num_electio
         ax[0].set_xticks([0, 1, 2, 3, 4, 5, 6, 7, 8])
         
     ax[0].set_ylim(0, num_elections)  # Set to the number of simulated elections
-    ax[0].set_xlabel('Number of Elected POC Candidates')
+    ax[0].set_xlabel('Number of Elected ' + cand_type + ' Candidates')
     ax[0].set_ylabel('Frequency')
     ax[0].set_title(f'Histogram for {election_type.upper()} Model')
      # Display the average and parameters text
@@ -190,7 +196,7 @@ def generate_histogram(data, election_type, simulation_type, params, num_electio
         ax[1].set_axis_off()
         fig.subplots_adjust(bottom=0.25, top=0.95)
 
-    ax[1].text(0.5, 0.95, f'Average Number of Elected POC Candidates: {average_value:.2f}', ha="center", fontsize=8)
+    ax[1].text(0.5, 0.95, f'Average Number of Elected {cand_type} Candidates: {average_value:.2f}', ha="center", fontsize=8)
 
     if zone:
         folder_name = f'{election_type}_Zone_{curr_zone}_Histograms'

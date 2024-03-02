@@ -31,7 +31,7 @@ running_script_name="port_test.sh"
 # RUNNING PARAMETERS
 # ==================
 
-n_elections=1
+n_elections=2
 
 output_dir="Port_outputs"
 log_dir="Port_logs"

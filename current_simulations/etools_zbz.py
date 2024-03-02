@@ -98,20 +98,31 @@ def simulate_ensembles(
                     tiebreak = "random", # Added from chris' code
                 ).run_election()
 
-                num_winners = count_winners(results.winners(), "C")
+                num_winners_c = count_winners(results.winners(), "C")
+                num_winners_wp = count_winners(results.winners(), "WP")
+                num_winners_wc = count_winners(results.winners(), "WC")
 
                 if model_name not in zone_data:
-                    zone_data[model_name] = []
-                zone_data[model_name].append(num_winners)
+                    zone_data[model_name] = {}
+                    zone_data[model_name]["C"] = []
+                    zone_data[model_name]["WP"] = []
+                    zone_data[model_name]["WC"] = []
+
+                zone_data[model_name]["C"].append(num_winners_c)
+                zone_data[model_name]["WP"].append(num_winners_wp)
+                zone_data[model_name]["WC"].append(num_winners_wc)
+
         plan_results.append(zone_data)
 
+    condensed = condense_results(plan_results)
+
     print(f"Plan Results {zn}", plan_results)
-    print("Results across zones", condense_results(plan_results))
-    #print(plan_results)
+    print("Results across zones", condensed)
 
-    return(plan_results), condense_results(plan_results)
+    return(plan_results), condensed
+    
 
-def condense_results (plan_results):
+def condense_results_single_cand (plan_results):
     election_results = {}
     
     for election_type in ballot_generators:
@@ -124,6 +135,29 @@ def condense_results (plan_results):
                 summed_zone_results = win_list
             else: 
                 summed_zone_results = np.add(summed_zone_results, win_list)
+        election_results[election_type] = summed_zone_results
+        print("TO SEE")
+        print(election_results[election_type])
+
+    return election_results
+
+def condense_results(plan_results):
+    election_results = {}
+    
+    for election_type in ballot_generators:
+        summed_zone_results = {'C': [], 'WP': [], 'WC':[]}
+        for item in plan_results:
+            zone = item['zone']
+
+            for cand_type in item[election_type]:
+                win_list = item[election_type][cand_type]
+
+                if len(summed_zone_results[cand_type]) == 0:
+                    summed_zone_results[cand_type] = win_list
+                    
+                else: 
+                    summed_zone_results[cand_type] = np.add(summed_zone_results[cand_type], win_list)
+
         election_results[election_type] = summed_zone_results
 
     return election_results
