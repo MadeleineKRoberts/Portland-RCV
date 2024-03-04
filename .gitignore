@@ -166,7 +166,11 @@ cython_debug/
 #.idea/
 
 #Folders
-/current_simulations/Histograms
-/current_simulations/Results
-/current_simulations/Port_logs
-/current_simulations/Port_outputs
+/current_simulations_3_block/Histograms
+/current_simulations_3_block/Results
+/current_simulations_3_block/Port_logs
+/current_simulations_3_block/Port_outputs
+/current_simulations_2_block/Histograms
+/current_simulations_2_block/Results
+/current_simulations_2_block/Port_logs
+/current_simulations_2_block/Port_outputs
