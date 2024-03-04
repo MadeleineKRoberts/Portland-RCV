@@ -69,7 +69,7 @@ cohesion_wc_matrix=("0.1 0.1 0.8" \
                     "0.1 0.05 0.85" \
                     "0.1 0.05 0.85")
 
-candidates_matrix=("2 5 5"\
+candidates_matrix=("2 5 5" \
                    "2 8 2" \
                    "6 4 4" \
                    "6 7 1" \
@@ -78,7 +78,7 @@ candidates_matrix=("2 5 5"\
                    "3 4 4" \
                    "3 7 1" \ 
                    "3 5 5" \
-                   "4 5 5")
+                   "4 5 5" )
 
 # ===============================================================
 # Ideally, you should not need to modify anything below this line
