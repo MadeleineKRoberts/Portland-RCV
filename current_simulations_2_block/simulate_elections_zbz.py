@@ -48,6 +48,7 @@ def simulate_elections(candidates, alpha_poc_params, alpha_wp_params,
     # iterate across each zones
     cand_types = ['C', 'W']
     cand_long = {'C':'POC Preferred', 'W':'White'}
+    cand_color = {'C':'skyblue', 'W':'lightgreen'}
     print('basic_start_zone_data',basic_start_zone_data)
     for zone_data in basic_start_zone_data:
         print('hist zone', zone_data)
@@ -114,7 +115,8 @@ def simulate_elections(candidates, alpha_poc_params, alpha_wp_params,
                 curr_zone=curr_zone, 
                 num_candidates_c=candidates_poc,  
                 num_candidates_wp=candidates_wp,
-                zone=True
+                zone=True,
+                color=cand_color[curr_cand]
             )
 
             generate_histogram(
@@ -127,13 +129,14 @@ def simulate_elections(candidates, alpha_poc_params, alpha_wp_params,
                 curr_zone=curr_zone, 
                 num_candidates_c=candidates_poc,  
                 num_candidates_wp=candidates_wp,
-                zone=False
+                zone=False,
+                color=cand_color[curr_cand]
             )
         
 
 
 def generate_histogram(data, cand_type, election_type, simulation_type, params, num_elections, curr_zone, num_candidates_c, 
-                       num_candidates_wp, show_plot=False, zone=True):
+                       num_candidates_wp, show_plot=False, zone=True, color="blue"):
     """
     Generate and save a histogram based on election data.
     """
@@ -143,7 +146,7 @@ def generate_histogram(data, cand_type, election_type, simulation_type, params, 
 
     # Ensure that the bins on the x-axis include 0, 1, 2, and 3
     bin_edges = np.arange(-0.5, max(unique_values) + 1.5, 1)
-    ax[0].hist(data, bins=bin_edges, align='mid', alpha=0.7, edgecolor='black')
+    ax[0].hist(data, bins=bin_edges, align='mid', alpha=0.7, edgecolor='black', color=color)
     if zone:
         ax[0].set_xticks([0, 1, 2, 3])
     else:
