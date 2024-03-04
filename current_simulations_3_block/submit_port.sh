@@ -40,7 +40,7 @@ alpha_poc_matrix=("1 1 1")
 
 alpha_wp_matrix=("1 1 1")
 
-alpha_wc_matrix=("1 1 1")
+alpha_wm_matrix=("1 1 1")
 
 cohesion_poc_matrix=("0.8 0.1 0.1" \
                      "0.4 0.3 0.3" \
@@ -60,7 +60,7 @@ cohesion_wp_matrix=("0.1 0.8 0.1" \
                     "0.3 0.6 0.1" \
                     "0.45 0.45 0.1")
 
-cohesion_wc_matrix=("0.1 0.1 0.8" \
+cohesion_wm_matrix=("0.1 0.1 0.8" \
                     "0.3 0.3 0.4" \
                     "0.1 0.45 0.45" \
                     "0.1 0.1 0.8" \
@@ -101,10 +101,10 @@ generate_file_label() {
     local candidates="$1"
     local alpha_poc="$2"
     local alpha_wp="$3"
-    local alpha_wc="$4"
+    local alpha_wm="$4"
     local cohesion_poc="$5"
     local cohesion_wp="$6"
-    local cohesion_wc="$7"
+    local cohesion_wm="$7"
     local n_elections="$8"
 
 
@@ -113,10 +113,10 @@ generate_file_label() {
     echo "cand_${candidates// /-}"\
         "apoc_${alpha_poc// /-}"\
         "awp_${alpha_wp// /-}"\
-        "awc_${alpha_wc// /-}"\
+        "awm_${alpha_wm// /-}"\
         "copoc_${cohesion_poc// /-}"\
         "cowp_${cohesion_wp// /-}"\
-        "cowc_${cohesion_wc// /-}"\
+        "cowm_${cohesion_wm// /-}"\
         "n_elec_${n_elections// /-}"\
         | tr ' ' '_'
     # The tr command replaces spaces with underscores so that
@@ -127,16 +127,16 @@ generate_file_label() {
 
 for i in "${!alpha_poc_matrix[@]}"; do
 for j in "${!alpha_wp_matrix[@]}"; do
-for k in "${!alpha_wc_matrix[@]}"; do
+for k in "${!alpha_wm_matrix[@]}"; do
     alpha_poc="${alpha_poc_matrix[$i]}"
     alpha_wp="${alpha_wp_matrix[$j]}"
-    alpha_wc="${alpha_wc_matrix[$k]}"
+    alpha_wm="${alpha_wm_matrix[$k]}"
     
     # Cohesion parameters are grouped by their index, so we loop through them separately
     for l in "${!cohesion_poc_matrix[@]}"; do
         cohesion_poc="${cohesion_poc_matrix[$l]}"
         cohesion_wp="${cohesion_wp_matrix[$l]}"
-        cohesion_wc="${cohesion_wc_matrix[$l]}"
+        cohesion_wm="${cohesion_wm_matrix[$l]}"
         
         for m in "${!candidates_matrix[@]}"; do
             candidates="${candidates_matrix[$m]}"
@@ -145,10 +145,10 @@ for k in "${!alpha_wc_matrix[@]}"; do
                 "$candidates" \
                 "$alpha_poc" \
                 "$alpha_wp" \
-                "$alpha_wc" \
+                "$alpha_wm" \
                 "$cohesion_poc" \
                 "$cohesion_wp" \
-                "$cohesion_wc" \
+                "$cohesion_wm" \
                 "$n_elections"
             )
             
@@ -185,10 +185,10 @@ for k in "${!alpha_wc_matrix[@]}"; do
                 $running_script_name \
                     "$alpha_poc" \
                     "$alpha_wp" \
-                    "$alpha_wc" \
+                    "$alpha_wm" \
                     "$cohesion_poc" \
                     "$cohesion_wp" \
-                    "$cohesion_wc" \
+                    "$cohesion_wm" \
                     "$candidates" \
                     "$n_elections" \
                     "$output_file" \

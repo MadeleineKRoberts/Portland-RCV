@@ -10,7 +10,7 @@
 
 alpha_poc_params=$1
 alpha_wp_params=$2
-alpha_wc_params=$3
+alpha_wm_params=$3
 cohesion_poc_params=$4
 cohesion_white_progressive_params=$5
 cohesion_white_conservative_params=$6
@@ -22,7 +22,7 @@ log_file=${10}
 
 echo --alpha_poc_params "$alpha_poc_params"
 echo --alpha_wp_params "$alpha_wp_params"
-echo --alpha_wc_params "$alpha_wc_params" 
+echo --alpha_wm_params "$alpha_wm_params" 
 echo --cohesion_poc_params "$cohesion_poc_params" 
 echo --cohesion_white_progressive_params "$cohesion_white_progressive_params" 
 echo --cohesion_white_conservative_params "$cohesion_white_conservative_params" 
@@ -36,7 +36,7 @@ echo --log_file "$log_file"
         --candidates "$candidates" \
         --alpha_poc_params "$alpha_poc_params" \
         --alpha_wp_params "$alpha_wp_params" \
-        --alpha_wc_params "$alpha_wc_params" \
+        --alpha_wm_params "$alpha_wm_params" \
         --cohesion_poc_params "$cohesion_poc_params" \
         --cohesion_white_progressive_params "$cohesion_white_progressive_params" \
         --cohesion_white_conservative_params "$cohesion_white_conservative_params" \
