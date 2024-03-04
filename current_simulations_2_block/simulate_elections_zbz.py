@@ -48,7 +48,7 @@ def simulate_elections(candidates, alpha_poc_params, alpha_wp_params,
     # iterate across each zones
     cand_types = ['C', 'W']
     cand_long = {'C':'POC Preferred', 'W':'White'}
-    cand_color = {'C':'skyblue', 'W':'lightgreen'}
+    cand_color = {'C':'blue', 'W':'orange'}
     print('basic_start_zone_data',basic_start_zone_data)
     for zone_data in basic_start_zone_data:
         print('hist zone', zone_data)
