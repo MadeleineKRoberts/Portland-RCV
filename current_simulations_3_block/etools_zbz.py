@@ -171,7 +171,7 @@ def count_winners(elected: list[set], party: str) -> int:
 
     for winner_set in elected:
         for cand in winner_set:
-            if cand[0] == party:
+            if cand[0] == party or cand[0:2] == party:
                 winner_count += 1
 
     return winner_count
