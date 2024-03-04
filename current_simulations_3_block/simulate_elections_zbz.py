@@ -152,7 +152,7 @@ def simulate_elections(candidates, alpha_poc_params, alpha_wp_params, alpha_wc_p
                 num_candidates_wp=candidates_wp, 
                 num_candidates_wc=candidates_wc,
                 zone=False,
-                color=cand_color[cand_types]
+                color=cand_color[curr_cand]
             )
         
 
