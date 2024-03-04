@@ -18,7 +18,7 @@ ballot_generators = {
 
 candidates_to_select = {
     "WP": ["WP1", "WP2", "WP3", "WP4", "WP5", "WP6", "WP7", "WP8", "WP9", "WP10"],
-    "WC": ["WC1", "WC2", "WC3", "WC4", "WC5", "WC6", "WC7", "WC8", "WC9", "WC10"],
+    "WM": ["WM1", "WM2", "WM3", "WM4", "WM5", "WM6", "WM7", "WM8", "WM9", "WM10"],
     "C": ["C1", "C2", "C3", "C4", "C5", "C6", "C7", "C8", "C9", "C10"],
 }
 
@@ -44,13 +44,13 @@ def simulate_ensembles(
     current_dir = os.path.dirname(current_file_path)
 
     # Portland blocks and coorsponding white VAP
-    # Option 1 WC + Non-Progressive Whites Grouped as WC
+    # Option 1 WM + Non-Progressive Whites Grouped as WM
     # Option 2 Leave Out Non-Progressive Whites
 
-    zone_shares = {1: {"C": 0.38, "WP": 0.43, "WC": 0.19},
-            2: {"C": 0.26, "WP": 0.68, "WC": 0.06},
-            3: {"C": 0.20, "WP": 0.73, "WC": 0.07},
-            4: {"C": 0.17, "WP": 0.73, "WC": 0.10}}
+    zone_shares = {1: {"C": 0.38, "WP": 0.43, "WM": 0.19},
+            2: {"C": 0.26, "WP": 0.68, "WM": 0.06},
+            3: {"C": 0.20, "WP": 0.73, "WM": 0.07},
+            4: {"C": 0.17, "WP": 0.73, "WM": 0.10}}
 
     for zone, shares in zone_shares.items():
         total_share = sum(shares.values())
@@ -69,7 +69,7 @@ def simulate_ensembles(
         print (zn, blocs)
         cand_slate = {
             "WP": candidates_to_select["WP"][:candidates[1]],  
-            "WC": candidates_to_select["WC"][:candidates[2]],  
+            "WM": candidates_to_select["WM"][:candidates[2]],  
             "C": candidates_to_select["C"][:candidates[0]],   
         }
         # loop through number of simulated RCV elections
@@ -100,17 +100,17 @@ def simulate_ensembles(
 
                 num_winners_c = count_winners(results.winners(), "C")
                 num_winners_wp = count_winners(results.winners(), "WP")
-                num_winners_wc = count_winners(results.winners(), "WC")
+                num_winners_wm = count_winners(results.winners(), "WM")
 
                 if model_name not in zone_data:
                     zone_data[model_name] = {}
                     zone_data[model_name]["C"] = []
                     zone_data[model_name]["WP"] = []
-                    zone_data[model_name]["WC"] = []
+                    zone_data[model_name]["WM"] = []
 
                 zone_data[model_name]["C"].append(num_winners_c)
                 zone_data[model_name]["WP"].append(num_winners_wp)
-                zone_data[model_name]["WC"].append(num_winners_wc)
+                zone_data[model_name]["WM"].append(num_winners_wm)
 
         plan_results.append(zone_data)
 
@@ -145,7 +145,7 @@ def condense_results(plan_results):
     election_results = {}
     
     for election_type in ballot_generators:
-        summed_zone_results = {'C': [], 'WP': [], 'WC':[]}
+        summed_zone_results = {'C': [], 'WP': [], 'WM':[]}
         for item in plan_results:
             zone = item['zone']
 

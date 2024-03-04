@@ -13,13 +13,13 @@ ballot_generators = {
     "sp": "Slate Preference"
 }
 
-def simulate_elections(candidates, alpha_poc_params, alpha_wp_params, alpha_wc_params, 
+def simulate_elections(candidates, alpha_poc_params, alpha_wp_params, alpha_wm_params, 
                         cohesion_poc_params, cohesion_white_progressive_params, 
                         cohesion_white_conservative_params, num_elections):
 
     candidates_poc = candidates[0]
     candidates_wp = candidates[1]
-    candidates_wc = candidates[2]
+    candidates_wm = candidates[2]
 
     alpha_poc_1 = alpha_poc_params[0]
     alpha_poc_2 = alpha_poc_params[1]
@@ -29,9 +29,9 @@ def simulate_elections(candidates, alpha_poc_params, alpha_wp_params, alpha_wc_p
     alpha_wp_2 = alpha_wp_params[1]
     alpha_wp_3 = alpha_wp_params[2]
 
-    alpha_wc_1 = alpha_wc_params[0]
-    alpha_wc_2 = alpha_wc_params[1]
-    alpha_wc_3 = alpha_wc_params[2]
+    alpha_wm_1 = alpha_wm_params[0]
+    alpha_wm_2 = alpha_wm_params[1]
+    alpha_wm_3 = alpha_wm_params[2]
 
     coh_poc_1 = cohesion_poc_params[0]
     coh_poc_2 = cohesion_poc_params[1]
@@ -41,16 +41,16 @@ def simulate_elections(candidates, alpha_poc_params, alpha_wp_params, alpha_wc_p
     coh_wp_2 = cohesion_white_progressive_params[1]
     coh_wp_3 = cohesion_white_progressive_params[2]
 
-    coh_wc_1 = cohesion_white_conservative_params[0]
-    coh_wc_2 = cohesion_white_conservative_params[1]
-    coh_wc_3 = cohesion_white_conservative_params[2]
+    coh_wm_1 = cohesion_white_conservative_params[0]
+    coh_wm_2 = cohesion_white_conservative_params[1]
+    coh_wm_3 = cohesion_white_conservative_params[2]
 
-    alphas = {"C": {"C": alpha_poc_1, "WP": alpha_poc_2, "WC": alpha_poc_3},
-            "WP": {"C": alpha_wp_1, "WP": alpha_wp_2, "WC": alpha_wp_3},
-            "WC": {"C": alpha_wc_1, "WP": alpha_wc_2, "WC": alpha_wc_3}}
-    cohesion = {"C": {"C": coh_poc_1, "WP": coh_poc_2, "WC": coh_poc_3},
-            "WP": {"C": coh_wp_1, "WP": coh_wp_2, "WC": coh_wp_3},
-            "WC": {"C": coh_wc_1, "WP": coh_wc_2, "WC": coh_wc_3}}
+    alphas = {"C": {"C": alpha_poc_1, "WP": alpha_poc_2, "WM": alpha_poc_3},
+            "WP": {"C": alpha_wp_1, "WP": alpha_wp_2, "WM": alpha_wp_3},
+            "WM": {"C": alpha_wm_1, "WP": alpha_wm_2, "WM": alpha_wm_3}}
+    cohesion = {"C": {"C": coh_poc_1, "WP": coh_poc_2, "WM": coh_poc_3},
+            "WP": {"C": coh_wp_1, "WP": coh_wp_2, "WM": coh_wp_3},
+            "WM": {"C": coh_wm_1, "WP": coh_wm_2, "WM": coh_wm_3}}
 
     basic_start = simulate_ensembles(
         cohesion=cohesion, 
@@ -62,9 +62,9 @@ def simulate_elections(candidates, alpha_poc_params, alpha_wp_params, alpha_wc_p
 
     basic_start_zone_data, aggregated_data = basic_start
     # iterate across each zones
-    cand_types = ['C', 'WP', 'WC']
-    cand_long = {'C':'POC Preferred', 'WP':'White Progressive Preferred', 'WC':'White Moderate Preferred'}
-    cand_color = {'C':'skyblue', 'WP':'lightgreen', 'WC':'lightcoral'}
+    cand_types = ['C', 'WP', 'WM']
+    cand_long = {'C':'POC Preferred', 'WP':'White Progressive Preferred', 'WM':'White Moderate Preferred'}
+    cand_color = {'C':'skyblue', 'WP':'lightgreen', 'WM':'lightcoral'}
     print('basic_start_zone_data',basic_start_zone_data)
     for zone_data in basic_start_zone_data:
         print('hist zone', zone_data)
@@ -81,13 +81,13 @@ def simulate_elections(candidates, alpha_poc_params, alpha_wp_params, alpha_wc_p
                 f"Zone: {curr_zone}\n"
                 f"Number of POC candidates: {candidates_poc}\n"
                 f"Number of WP candidates: {candidates_wp}\n"
-                f"Number of WC candidates: {candidates_wc}\n"
-                "Alphas POC (POC, WP, WC): " + ", ".join(map(str, alpha_poc_params)) + "\n"
-                "Alphas WP (POC, WP, WC): " + ", ".join(map(str, alpha_wp_params)) + "\n"
-                "Alphas WC (POC, WP, WC): " + ", ".join(map(str, alpha_wc_params)) + "\n"
-                "Cohesion POC (POC, WP, WC): " + ", ".join(map(str, cohesion_poc_params)) + "\n"
-                "Cohesion WP (POC, WP, WC): " + ", ".join(map(str, cohesion_white_progressive_params)) + "\n"
-                "Cohesion WC (POC, WP, WC): " + ", ".join(map(str, cohesion_white_conservative_params)) + "\n"
+                f"Number of WM candidates: {candidates_wm}\n"
+                "Alphas POC (POC, WP, WM): " + ", ".join(map(str, alpha_poc_params)) + "\n"
+                "Alphas WP (POC, WP, WM): " + ", ".join(map(str, alpha_wp_params)) + "\n"
+                "Alphas WM (POC, WP, WM): " + ", ".join(map(str, alpha_wm_params)) + "\n"
+                "Cohesion POC (POC, WP, WM): " + ", ".join(map(str, cohesion_poc_params)) + "\n"
+                "Cohesion WP (POC, WP, WM): " + ", ".join(map(str, cohesion_white_progressive_params)) + "\n"
+                "Cohesion WM (POC, WP, WM): " + ", ".join(map(str, cohesion_white_conservative_params)) + "\n"
                 f"Number of Simulated Elections: {num_elections}"
             )
         
@@ -101,7 +101,7 @@ def simulate_elections(candidates, alpha_poc_params, alpha_wp_params, alpha_wc_p
                     "candidates": {
                         "POC": candidates_poc,
                         "WP": candidates_wp,
-                        "WC": candidates_wc,
+                        "WM": candidates_wm,
                     },
                 "results": results
                 }
@@ -119,9 +119,9 @@ def simulate_elections(candidates, alpha_poc_params, alpha_wp_params, alpha_wc_p
 
             # Construct a string to describe the simulation type, should be done outside the 'with open' block
             simulation_type = (
-                f'{curr_cand}candType_{candidates_poc}C_{candidates_wp}WP_{candidates_wc}WC_'
-                f'{alphas["C"]["C"]}aCC_{alphas["C"]["WP"]}aCWP_{alphas["C"]["WC"]}aCWC_'
-                f'{coh_poc_1}cohC_{coh_wp_1}cohWP_{coh_wc_1}cohWC_'
+                f'{curr_cand}candType_{candidates_poc}C_{candidates_wp}WP_{candidates_wm}WM_'
+                f'{alphas["C"]["C"]}aCC_{alphas["C"]["WP"]}aCWP_{alphas["C"]["WM"]}aCWM_'
+                f'{coh_poc_1}cohC_{coh_wp_1}cohWP_{coh_wm_1}cohWM_'
                 f'{num_elections}sims'
             )
 
@@ -135,7 +135,7 @@ def simulate_elections(candidates, alpha_poc_params, alpha_wp_params, alpha_wc_p
                 curr_zone=curr_zone, 
                 num_candidates_c=candidates_poc,  
                 num_candidates_wp=candidates_wp, 
-                num_candidates_wc=candidates_wc,
+                num_candidates_wm=candidates_wm,
                 zone=True,
                 color=cand_color[curr_cand]
             )
@@ -150,7 +150,7 @@ def simulate_elections(candidates, alpha_poc_params, alpha_wp_params, alpha_wc_p
                 curr_zone=curr_zone, 
                 num_candidates_c=candidates_poc,  
                 num_candidates_wp=candidates_wp, 
-                num_candidates_wc=candidates_wc,
+                num_candidates_wm=candidates_wm,
                 zone=False,
                 color=cand_color[curr_cand]
             )
@@ -158,7 +158,7 @@ def simulate_elections(candidates, alpha_poc_params, alpha_wp_params, alpha_wc_p
 
 
 def generate_histogram(data, cand_type, election_type, simulation_type, params, num_elections, curr_zone, num_candidates_c, 
-                       num_candidates_wp, num_candidates_wc, show_plot=False, zone=True, color="blue"):
+                       num_candidates_wp, num_candidates_wm, show_plot=False, zone=True, color="blue"):
     """
     Generate and save a histogram based on election data.
     """
@@ -217,10 +217,10 @@ def generate_histogram(data, cand_type, election_type, simulation_type, params, 
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Run election simulations.')
-    parser.add_argument("--candidates", type=str, help="Number of candidates in order POC, WP, WC")
+    parser.add_argument("--candidates", type=str, help="Number of candidates in order POC, WP, WM")
     parser.add_argument("--alpha_poc_params", type=str, help="Alpha parameters for POC candidates")
     parser.add_argument("--alpha_wp_params", type=str, help="Alpha parameters for white progressive candidates")
-    parser.add_argument("--alpha_wc_params", type=str, help="Alpha parameters for white conservative candidates")
+    parser.add_argument("--alpha_wm_params", type=str, help="Alpha parameters for white conservative candidates")
     parser.add_argument("--cohesion_poc_params", type=str, help="Cohesion parameters for POC")
     parser.add_argument("--cohesion_white_progressive_params", type=str, help="Cohesion parameters for white progressives")
     parser.add_argument("--cohesion_white_conservative_params", type=str, help="Cohesion parameters for white conservatives")
@@ -234,7 +234,7 @@ def main():
     candidates = [int(i) for i in args.candidates.split(' ')]
     alpha_poc_params = [float(i) for i in args.alpha_poc_params.split(' ')]
     alpha_wp_params = [float(i) for i in args.alpha_wp_params.split(' ')]
-    alpha_wc_params = [float(i) for i in args.alpha_wc_params.split(' ')]
+    alpha_wm_params = [float(i) for i in args.alpha_wm_params.split(' ')]
     cohesion_poc_params = [float(i) for i in args.cohesion_poc_params.split(' ')]
     cohesion_white_progressive_params = [float(i) for i in args.cohesion_white_progressive_params.split(' ')]
     cohesion_white_conservative_params= [float(i) for i in args.cohesion_white_conservative_params.split(' ')]
@@ -243,7 +243,7 @@ def main():
         candidates = candidates,
         alpha_poc_params=alpha_poc_params,
         alpha_wp_params=alpha_wp_params,
-        alpha_wc_params=alpha_wc_params,
+        alpha_wm_params=alpha_wm_params,
         cohesion_poc_params=cohesion_poc_params,
         cohesion_white_progressive_params=cohesion_white_progressive_params,
         cohesion_white_conservative_params=cohesion_white_conservative_params,
